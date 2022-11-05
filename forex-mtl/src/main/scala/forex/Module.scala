@@ -1,18 +1,24 @@
 package forex
 
-import cats.effect.{ Concurrent, Timer }
+import cats.effect.{ Concurrent, Sync, Timer }
+import forex.cache.HotCacheRefresher
 import forex.config.ApplicationConfig
 import forex.http.rates.RatesHttpRoutes
 import forex.services._
 import forex.programs._
+import forex.services.rates.interpreters.OneFrameHotCached
 import org.http4s._
 import org.http4s.client.Client
 import org.http4s.implicits._
 import org.http4s.server.middleware.{ AutoSlash, Timeout }
 
-class Module[F[_]: Concurrent: Timer](config: ApplicationConfig, client: Client[F]) {
+class Module[F[_]: Concurrent: Timer: Sync](
+    config: ApplicationConfig,
+    client: Client[F]
+) {
 
-  private val ratesService: RatesService[F] = RatesServices.live[F](client)
+  private val ratesService: OneFrameHotCached[F] = RatesServices.hotCached[F](client, config.oneFrame)
+  val cacheRefresher: HotCacheRefresher[F]       = HotCacheRefresher.of(ratesService, config.cacheRefresh)
 
   private val ratesProgram: RatesProgram[F] = RatesProgram[F](ratesService)
 
