@@ -10,5 +10,9 @@ object Rate {
   final case class Pair(
       from: Currency,
       to: Currency
-  )
+  ) {
+    def pairString: String = {
+      s"${from}${to}"
+    }
+  }
 }
