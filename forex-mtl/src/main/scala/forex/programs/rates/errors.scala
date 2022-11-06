@@ -4,12 +4,14 @@ import forex.services.rates.errors.{ Error => RatesServiceError }
 
 object errors {
 
-  sealed trait Error extends Exception
+  sealed trait Error extends Exception {
+    def msg: String
+
+    override def getMessage: String = msg
+  }
   object Error {
     final case class RateLookupFailed(msg: String) extends Error
   }
 
-  def toProgramError(error: RatesServiceError): Error = error match {
-    case RatesServiceError.OneFrameLookupFailed(msg) => Error.RateLookupFailed(msg)
-  }
+  def toProgramError(error: RatesServiceError): Error = Error.RateLookupFailed(error.msg)
 }
