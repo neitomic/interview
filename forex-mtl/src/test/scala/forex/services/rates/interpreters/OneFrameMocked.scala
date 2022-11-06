@@ -35,8 +35,10 @@ trait OneFrameMocked {
       )
     )
 
-  def mockBaseUrl(): String =
-    wiremockSever.baseUrl()
+  def mockBaseUrl(): String = {
+    wiremockSever.isRunning
+      wiremockSever.baseUrl()
+    }
 
   def mockToken(): String = token
 

@@ -1,7 +1,7 @@
 package forex.cache
 
-import cats.effect.{ ContextShift, IO, Timer }
-import forex.config.CacheRefreshConfig
+import cats.effect.{ContextShift, IO, Timer}
+import forex.config.CacheConfig
 import org.scalatest.matchers.should
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -20,7 +20,7 @@ class HotCacheRefresherTest extends AnyWordSpec with should.Matchers {
 
     def getCounter(): Int = counter.get()
   }
-  val refresher = HotCacheRefresher.of(hotCached, CacheRefreshConfig(200.millis))
+  val refresher = HotCacheRefresher.of(hotCached, CacheConfig(200.millis, 1.second))
 
   "HotCacheRefresher" should {
     "refresh" in {
