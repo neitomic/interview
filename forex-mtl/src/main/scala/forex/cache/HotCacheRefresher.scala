@@ -1,18 +1,18 @@
 package forex.cache
 
 import cats.Applicative
-import forex.config.CacheRefreshConfig
+import forex.config.CacheConfig
 import cats.effect._
 import cats.syntax.apply._
 import cats.syntax.flatMap._
 
 class HotCacheRefresher[F[_]: Applicative: Timer: Sync](
     hotCached: HotCached[F],
-    refreshConfig: CacheRefreshConfig
+    cacheConfig: CacheConfig
 ) {
 
   private def reloadCacheTimer(): F[Unit] =
-    Timer[F].sleep(refreshConfig.refreshInterval) *> hotCached.reloadCache()
+    Timer[F].sleep(cacheConfig.refreshInterval) *> hotCached.reloadCache()
 
   private def repeat(): F[Unit] =
     reloadCacheTimer() >> repeat()
@@ -24,7 +24,7 @@ class HotCacheRefresher[F[_]: Applicative: Timer: Sync](
 object HotCacheRefresher {
   def of[F[_]: Applicative: Timer: Sync](
       hotCached: HotCached[F],
-      cacheRefreshConfig: CacheRefreshConfig
+      cacheConfig: CacheConfig
   ): HotCacheRefresher[F] =
-    new HotCacheRefresher(hotCached, cacheRefreshConfig)
+    new HotCacheRefresher(hotCached, cacheConfig)
 }

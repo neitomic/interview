@@ -3,7 +3,8 @@ package forex
 import cats.effect.{ Concurrent, Sync, Timer }
 import forex.cache.HotCacheRefresher
 import forex.config.ApplicationConfig
-import forex.http.rates.RatesHttpRoutes
+import forex.http.errors.HttpErrorHandler
+import forex.http.rates.{ RatesHttpErrorHandler, RatesHttpRoutes }
 import forex.services._
 import forex.programs._
 import forex.services.rates.interpreters.OneFrameHotCached
@@ -17,12 +18,13 @@ class Module[F[_]: Concurrent: Timer: Sync](
     client: Client[F]
 ) {
 
-  private val ratesService: OneFrameHotCached[F] = RatesServices.hotCached[F](client, config.oneFrame)
-  val cacheRefresher: HotCacheRefresher[F]       = HotCacheRefresher.of(ratesService, config.cacheRefresh)
+  private val ratesService: OneFrameHotCached[F] = RatesServices.hotCached[F](client, config.oneFrame, config.cache)
+  val cacheRefresher: HotCacheRefresher[F]       = HotCacheRefresher.of(ratesService, config.cache)
 
   private val ratesProgram: RatesProgram[F] = RatesProgram[F](ratesService)
 
-  private val ratesHttpRoutes: HttpRoutes[F] = new RatesHttpRoutes[F](ratesProgram).routes
+  private implicit val ratesErrorHandler: HttpErrorHandler[F] = new RatesHttpErrorHandler[F]()
+  private val ratesHttpRoutes: HttpRoutes[F]                  = new RatesHttpRoutes[F](ratesProgram).routes
 
   type PartialMiddleware = HttpRoutes[F] => HttpRoutes[F]
   type TotalMiddleware   = HttpApp[F] => HttpApp[F]
