@@ -1,12 +1,11 @@
 package forex.cache
 
-import cats.Applicative
 import forex.config.CacheConfig
 import cats.effect._
 import cats.syntax.apply._
 import cats.syntax.flatMap._
 
-class HotCacheRefresher[F[_]: Applicative: Timer: Sync](
+class HotCacheRefresher[F[_]: Timer: Sync](
     hotCached: HotCached[F],
     cacheConfig: CacheConfig
 ) {
@@ -22,7 +21,7 @@ class HotCacheRefresher[F[_]: Applicative: Timer: Sync](
 }
 
 object HotCacheRefresher {
-  def of[F[_]: Applicative: Timer: Sync](
+  def of[F[_]: Timer: Sync](
       hotCached: HotCached[F],
       cacheConfig: CacheConfig
   ): HotCacheRefresher[F] =

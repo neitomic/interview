@@ -1,20 +1,18 @@
 package forex.services.rates.interpreters
 
-import cats.Applicative
 import cats.data.EitherT
-import cats.effect.{ Sync, Timer }
+import cats.effect.Sync
 import cats.implicits._
 import forex.config.OneFrameConfig
 import forex.domain
-import forex.services.rates.{ errors, Algebra }
-import org.http4s.{ Headers, Method, Request }
-import org.http4s.client.Client
-import org.http4s.{ Header, Uri }
-import oneframe.Converters._
-import oneframe._
+import forex.services.rates.interpreters.oneframe.Converters._
+import forex.services.rates.interpreters.oneframe._
+import forex.services.rates.{Algebra, errors}
 import org.http4s.circe.CirceEntityDecoder._
+import org.http4s.client.Client
+import org.http4s._
 
-class OneFrameLive[F[_]: Applicative: Timer: Sync](
+class OneFrameLive[F[_]: Sync](
     client: Client[F],
     oneFrameConfig: OneFrameConfig
 ) extends Algebra[F] {

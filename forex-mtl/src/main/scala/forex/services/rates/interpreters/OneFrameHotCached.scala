@@ -15,7 +15,7 @@ import org.typelevel.log4cats.slf4j.Slf4jLogger
 import java.time.OffsetDateTime
 import java.util.concurrent.ConcurrentHashMap
 
-class OneFrameHotCached[F[_]: Applicative: Sync](
+class OneFrameHotCached[F[_]: Sync](
     underlying: Algebra[F],
     cacheConfig: CacheConfig
 ) extends Algebra[F]

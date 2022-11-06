@@ -1,19 +1,19 @@
 package forex
 
-import cats.effect.{ Concurrent, Sync, Timer }
+import cats.effect.{ Concurrent, Timer }
 import forex.cache.HotCacheRefresher
 import forex.config.ApplicationConfig
 import forex.http.errors.HttpErrorHandler
 import forex.http.rates.{ RatesHttpErrorHandler, RatesHttpRoutes }
-import forex.services._
 import forex.programs._
+import forex.services._
 import forex.services.rates.interpreters.OneFrameHotCached
 import org.http4s._
 import org.http4s.client.Client
 import org.http4s.implicits._
 import org.http4s.server.middleware.{ AutoSlash, Timeout }
 
-class Module[F[_]: Concurrent: Timer: Sync](
+class Module[F[_]: Concurrent: Timer](
     config: ApplicationConfig,
     client: Client[F]
 ) {
